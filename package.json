@@ -49,11 +49,11 @@
     "node": ">= 14.0.0"
   },
   "scripts": {
-    "build": "yarn clean && yarn compile ",
+    "build": "yarn clean && yarn compile",
     "postbuild": "yarn gen-esm-wrapper dist/index.js dist/index.mjs",
     "clean": "rimraf ./dist",
     "compile": "tsc -p tsconfig.build.json",
-    "copy": "ts-node -T ../../scripts/copy.ts"
+    "copy": "ts-node -T scripts/copy.ts"
   },
   "publishConfig": {
     "access": "public"
