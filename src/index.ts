@@ -1,12 +1,11 @@
-export * from '@mikro-orm/knex';
 export * from './BetterSqliteConnection';
 export * from './BetterSqliteDriver';
+export * from './BetterSqliteExceptionConverter';
 export * from './BetterSqlitePlatform';
 export * from './BetterSqliteSchemaHelper';
-export * from './BetterSqliteExceptionConverter';
+export * from '@mikro-orm/knex';
 
-
-/* 
+/*
 const Database = require('better-sqlite3');
 const Database_en = require('better-sqlite3-multiple-ciphers');
 
@@ -22,7 +21,6 @@ db_en.exec(createTable);
 
 const stmt = db.prepare('INSERT INTO users (name, username, password) VALUES (@name, @username, @password)')
 const stmt_en = db_en.prepare('INSERT INTO users (name, username, password) VALUES (@name, @username, @password)')
-
 
 const insertMany = db.transaction((users: any) => {
     for (const user of users) stmt.run(user);
@@ -46,4 +44,3 @@ insertMany_en([
 
 db_en.close();
 db.close(); */
-
