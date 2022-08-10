@@ -51,7 +51,7 @@
   "scripts": {
     "build": "yarn clean && yarn compile",
     "postbuild": "yarn gen-esm-wrapper dist/index.js dist/index.mjs",
-    "clean": "rimraf ./dist",
+    "clean": "rimraf ./dist *.db",
     "compile": "tsc -p tsconfig.build.json",
     "copy": "ts-node -T scripts/copy.ts"
   },
@@ -60,7 +60,8 @@
   },
   "dependencies": {
     "@mikro-orm/knex": "^5.3.1",
-    "better-sqlite3": "7.6.2",
+    "better-sqlite3": "^7.6.2",
+    "better-sqlite3-multiple-ciphers": "^7.6.2",
     "fs-extra": "^10.1.0",
     "rimraf": "^3.0.2",
     "sqlstring-sqlite": "0.1.1",
@@ -68,6 +69,7 @@
   },
   "devDependencies": {
     "@mikro-orm/core": "^5.3.1",
+    "@types/better-sqlite3": "^7.6.0",
     "@types/fs-extra": "^9.0.13",
     "gen-esm-wrapper": "^1.1.3"
   },

@@ -1,58 +1,58 @@
 {
-  "compilerOptions": {
-      "module": "commonjs",
-      "sourceMap": true,
-      "declaration": true,
-      "removeComments": true,
-      "emitDecoratorMetadata": true,
-      "experimentalDecorators": true,
-      "esModuleInterop": true,
-      "skipLibCheck": true,
-      "incremental": true,
-      "target": "es2020",
-      "lib": [
-          "es2020"
-      ],
-      "outDir": "./dist",
-      "baseUrl": ".",
-      "paths": {
-          "@/*": [
-              "./src/*"
-          ],
-          "@migrations/*": [
-              "./migrations/*"
-          ],
-          "@orm-config": [
-              "./mikro-orm.config.ts"
-          ]
-      },
-      "strict": true,
-      "alwaysStrict": true,
-      "noUnusedLocals": true,
-      "noUnusedParameters": true,
-      "noImplicitReturns": true,
-      "noFallthroughCasesInSwitch": true,
-      "allowSyntheticDefaultImports": true,
-      "plugins": [
-          // Transform paths in output .js files
-          {
-              "transform": "typescript-transform-paths"
-          },
-          // Transform paths in output .d.ts files (Include this line if you output declarations files)
-          {
-              "transform": "typescript-transform-paths",
-              "afterDeclarations": true
-          }
-      ]
-  },
-  "include": [
-      "mikro-orm.config.ts",
-      "src/**/*",
-      "test/**/*",
-      "migrations/**/*"
-  ],
-  "exclude": [
-      "node_modules",
-      "dist"
-  ]
+"compilerOptions": {
+    "module": "commonjs",
+    "sourceMap": true,
+    "declaration": true,
+    "removeComments": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "incremental": true,
+    "target": "es2020",
+    "lib": [
+        "es2020"
+    ],
+    "outDir": "./dist",
+    "baseUrl": ".",
+    "paths": {
+        "@/*": [
+            "./src/*"
+        ],
+        "@migrations/*": [
+            "./migrations/*"
+        ],
+        "@orm-config": [
+            "./mikro-orm.config.ts"
+        ]
+    },
+    "strict": true,
+    "alwaysStrict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "allowSyntheticDefaultImports": true,
+    "plugins": [
+        // Transform paths in output .js files
+        {
+            "transform": "typescript-transform-paths"
+        },
+        // Transform paths in output .d.ts files (Include this line if you output declarations files)
+        {
+            "transform": "typescript-transform-paths",
+            "afterDeclarations": true
+        }
+    ]
+},
+"include": [
+    "mikro-orm.config.ts",
+    "src/**/*",
+    "test/**/*",
+    "migrations/**/*"
+],
+"exclude": [
+    "node_modules",
+    "dist"
+]
 }
