@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
+/* eslint-disable no-underscore-dangle */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
+
 import { dirname } from 'path';
 import { ensureDir, readFile } from 'fs-extra';
 import { Utils } from '@mikro-orm/core';
@@ -15,7 +17,7 @@ export class BetterSqliteConnection extends AbstractSqlConnection {
         await ensureDir(dirname(this.config.get('dbName')!));
         this.getPatchedDialect();
         this.client = this.createKnexClient('better-sqlite3');
-        await this.client.raw('PRAGMA foreign_keys = OFF');
+        await this.client.raw('PRAGMA foreign_keys = ON');
         await this.client.raw('PRAGMA rekey = secret_key');
     }
 
@@ -65,12 +67,12 @@ export class BetterSqliteConnection extends AbstractSqlConnection {
     private getPatchedDialect() {
         const { Sqlite3Dialect, Sqlite3DialectTableCompiler } = MonkeyPatchable;
 
-        if (Sqlite3Dialect.prototype.patched) {
+        if (Sqlite3Dialect.prototype.__patched) {
             return Sqlite3Dialect;
         }
 
         const { processResponse } = Sqlite3Dialect.prototype;
-        Sqlite3Dialect.prototype.patched = true;
+        Sqlite3Dialect.prototype.__patched = true;
         Sqlite3Dialect.prototype.processResponse = (obj: any, runner: any) => {
             if (obj.method === 'raw' && obj.sql.trim().match(BetterSqliteConnection.RUN_QUERY_RE)) {
                 return obj.context;
@@ -79,7 +81,7 @@ export class BetterSqliteConnection extends AbstractSqlConnection {
             return processResponse(obj, runner);
         };
 
-        Sqlite3Dialect.prototype.query = (connection: any, obj: any) => {
+        Sqlite3Dialect.prototype._query = (connection: any, obj: any) => {
             const callMethod = this.getCallMethod(obj);
 
             return new Promise((resolve: any, reject: any) => {
@@ -111,18 +113,19 @@ export class BetterSqliteConnection extends AbstractSqlConnection {
             foreignInfo.inTable = this.formatter.columnize(foreignInfo.inTable);
             foreignInfo.references = this.formatter.columnize(foreignInfo.references);
 
-            const addColumnQuery = this.sequence.find((query: { sql: string }) => query.sql.includes(`add column
+            const addColumnQuery = this.sequence.find((query: { sql: string }) => query.sql.includes(`add column 
             ${foreignInfo.column[0]}`));
 
             // no need for temp tables if we just add a column
             if (addColumnQuery) {
                 const onUpdate = foreignInfo.onUpdate ? ` on update ${foreignInfo.onUpdate}` : '';
                 const onDelete = foreignInfo.onDelete ? ` on delete ${foreignInfo.onDelete}` : '';
-                addColumnQuery.sql += ` constraint ${foreignInfo.keyName} references ${foreignInfo.inTable}
+                addColumnQuery.sql += ` constraint ${foreignInfo.keyName} references ${foreignInfo.inTable} 
                 (${foreignInfo.references})${onUpdate}${onDelete}`;
                 return;
             }
 
+            // eslint-disable-next-line @typescript-eslint/no-this-alias
             const compiler = this;
 
             if (this.method !== 'create' && this.method !== 'createIfNot') {

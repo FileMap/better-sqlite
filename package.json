@@ -60,7 +60,7 @@
   },
   "dependencies": {
     "@mikro-orm/knex": "^5.3.1",
-    "better-sqlite3": "^7.6.2",
+    "better-sqlite3": "https://github.com/m4heshd/better-sqlite3-multiple-ciphers.git",
     "better-sqlite3-multiple-ciphers": "^7.6.2",
     "fs-extra": "^10.1.0",
     "rimraf": "^3.0.2",
