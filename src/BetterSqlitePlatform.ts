@@ -1,9 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable unused-imports/no-unused-vars */
-/* eslint-disable max-len */
-/* eslint-disable @typescript-eslint/explicit-member-accessibility */
-// @ts-ignore
-import { escape } from 'sqlstring-sqlite';
+// import { escape } from 'sqlstring-sqlite';
 import { expr, JsonProperty, Utils } from '@mikro-orm/core';
 import { AbstractSqlPlatform } from '@mikro-orm/knex';
 
@@ -12,24 +8,27 @@ import { BetterSqliteSchemaHelper } from './BetterSqliteSchemaHelper';
 
 import type { EntityProperty } from '@mikro-orm/core';
 
+const { escape } = require('sqlstring-sqlite');
+
 export class BetterSqlitePlatform extends AbstractSqlPlatform {
     protected readonly schemaHelper: BetterSqliteSchemaHelper = new BetterSqliteSchemaHelper(this);
 
     protected readonly exceptionConverter = new BetterSqliteExceptionConverter();
 
-    usesDefaultKeyword(): boolean {
+    public usesDefaultKeyword(): boolean {
         return false;
     }
 
-    getCurrentTimestampSQL(_length: number): string {
+    public getCurrentTimestampSQL(_length: number): string {
         return super.getCurrentTimestampSQL(0);
     }
 
-    getDateTimeTypeDeclarationSQL(_column: { length: number }): string {
+    public getDateTimeTypeDeclarationSQL(_column: { length: number }): string {
         return 'datetime';
     }
 
-    getEnumTypeDeclarationSQL(column: { items?: unknown[]; fieldNames: string[]; length?: number; unsigned?: boolean; autoincrement?: boolean }): string {
+    public getEnumTypeDeclarationSQL(column: { items?: unknown[]; fieldNames: string[]; length?: number; unsigned?:
+    boolean; autoincrement?: boolean }): string {
         if (column.items?.every(item => Utils.isString(item))) {
             return 'text';
         }
@@ -37,35 +36,35 @@ export class BetterSqlitePlatform extends AbstractSqlPlatform {
         return this.getTinyIntTypeDeclarationSQL(column);
     }
 
-    getTinyIntTypeDeclarationSQL(column: { length?: number; unsigned?: boolean; autoincrement?: boolean }): string {
+    public getTinyIntTypeDeclarationSQL(column: { length?: number; unsigned?: boolean; autoincrement?: boolean }): string {
         return this.getIntegerTypeDeclarationSQL(column);
     }
 
-    getSmallIntTypeDeclarationSQL(column: { length?: number; unsigned?: boolean; autoincrement?: boolean }): string {
+    public getSmallIntTypeDeclarationSQL(column: { length?: number; unsigned?: boolean; autoincrement?: boolean }): string {
         return this.getIntegerTypeDeclarationSQL(column);
     }
 
-    getIntegerTypeDeclarationSQL(_column: { length?: number; unsigned?: boolean; autoincrement?: boolean }): string {
+    public getIntegerTypeDeclarationSQL(_column: { length?: number; unsigned?: boolean; autoincrement?: boolean }): string {
         return 'integer';
     }
 
-    getFloatDeclarationSQL(): string {
+    public getFloatDeclarationSQL(): string {
         return 'real';
     }
 
-    getBooleanTypeDeclarationSQL(): string {
+    public getBooleanTypeDeclarationSQL(): string {
         return 'integer';
     }
 
-    getVarcharTypeDeclarationSQL(_column: { length?: number }): string {
+    public getVarcharTypeDeclarationSQL(_column: { length?: number }): string {
         return 'text';
     }
 
-    convertsJsonAutomatically(): boolean {
+    public convertsJsonAutomatically(): boolean {
         return false;
     }
 
-    allowsComparingTuples() {
+    public allowsComparingTuples() {
         return false;
     }
 
@@ -75,7 +74,7 @@ export class BetterSqlitePlatform extends AbstractSqlPlatform {
    * data type in the payload as well as in original entity data. Without that, we would end up with diffs
    * including all Date properties, as we would be comparing Date object with timestamp.
    */
-    processDateProperty(value: unknown): string | number | Date {
+    public processDateProperty(value: unknown): string | number | Date {
         if (value instanceof Date) {
             return +value;
         }
@@ -83,7 +82,7 @@ export class BetterSqlitePlatform extends AbstractSqlPlatform {
         return value as number;
     }
 
-    quoteVersionValue(value: Date | number, prop: EntityProperty): Date | string | number {
+    public quoteVersionValue(value: Date | number, prop: EntityProperty): Date | string | number {
         if (prop.type.toLowerCase() === 'date') {
             return escape(value, true, this.timezone).replace(/^'|\.\d{3}'$/g, '');
         }
@@ -91,7 +90,7 @@ export class BetterSqlitePlatform extends AbstractSqlPlatform {
         return value;
     }
 
-    quoteValue(value: any): string {
+    public quoteValue(value: any): string {
     /* istanbul ignore if */
         if (Utils.isPlainObject(value) || value?.[JsonProperty]) {
             return escape(JSON.stringify(value), true, this.timezone);
@@ -104,7 +103,7 @@ export class BetterSqlitePlatform extends AbstractSqlPlatform {
         return escape(value, true, this.timezone);
     }
 
-    getSearchJsonPropertyKey(path: string[], _type: string, aliased: boolean): string {
+    public getSearchJsonPropertyKey(path: string[], _type: string, aliased: boolean): string {
         const [a, ...b] = path;
 
         if (aliased) {
@@ -114,7 +113,7 @@ export class BetterSqlitePlatform extends AbstractSqlPlatform {
         return `json_extract(${this.quoteIdentifier(a)}, '$.${b.join('.')}')`;
     }
 
-    getIndexName(tableName: string, columns: string[], type: 'index' | 'unique' | 'foreign' | 'primary' | 'sequence'): string {
+    public getIndexName(tableName: string, columns: string[], type: 'index' | 'unique' | 'foreign' | 'primary' | 'sequence'): string {
         if (type === 'primary') {
             return this.getDefaultPrimaryName(tableName, columns);
         }
@@ -122,11 +121,11 @@ export class BetterSqlitePlatform extends AbstractSqlPlatform {
         return super.getIndexName(tableName, columns, type);
     }
 
-    getDefaultPrimaryName(_tableName: string, _columns: string[]): string {
+    public getDefaultPrimaryName(_tableName: string, _columns: string[]): string {
         return 'primary';
     }
 
-    supportsDownMigrations(): boolean {
+    public supportsDownMigrations(): boolean {
         return false;
     }
 }

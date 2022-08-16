@@ -1,15 +1,3 @@
-/* eslint-disable prefer-destructuring */
-/* eslint-disable no-return-assign */
-/* eslint-disable func-names */
-/* eslint-disable consistent-return */
-/* eslint-disable @typescript-eslint/restrict-template-expressions */
-/* eslint-disable no-promise-executor-return */
-/* eslint-disable no-underscore-dangle */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable unused-imports/no-unused-vars */
-/* eslint-disable max-len */
-/* eslint-disable @typescript-eslint/explicit-member-accessibility */
-// @ts-ignore
 import { AbstractSqlDriver } from '@mikro-orm/knex';
 
 import { BetterSqliteConnection } from './BetterSqliteConnection';
@@ -22,14 +10,21 @@ export class BetterSqliteDriver extends AbstractSqlDriver<BetterSqliteConnection
         super(config, new BetterSqlitePlatform(), BetterSqliteConnection, ['knex', 'better-sqlite3']);
     }
 
-    async nativeInsertMany<T extends AnyEntity<T>>(entityName: string, data: EntityDictionary<T>[], options: NativeInsertUpdateManyOptions<T> = {}): Promise<QueryResult<T>> {
+    public async nativeInsertMany<T extends AnyEntity<T>>(
+        entityName: string,
+        data: EntityDictionary<T>[],
+        options: NativeInsertUpdateManyOptions<T> = {},
+    ): Promise<QueryResult<T>> {
         options.processCollections ??= true;
         const res = await super.nativeInsertMany(entityName, data, options);
         const pks = this.getPrimaryKeyFields(entityName);
         const first = res.insertId as number - data.length + 1;
         res.rows ??= [];
-        data.forEach((item, idx) => res.rows![idx] = { [pks[0]]: item[pks[0]] ?? first + idx });
-        res.row = res.rows[0];
+        data.forEach((item, idx) => {
+            res.rows![idx] = { [pks[0]]: item[pks[0]] ?? first + idx };
+            return res.rows![idx];
+        });
+        [res.row] = res.rows;
 
         return res;
     }

@@ -1,13 +1,5 @@
-/* eslint-disable func-names */
-/* eslint-disable consistent-return */
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
-/* eslint-disable no-promise-executor-return */
-/* eslint-disable no-underscore-dangle */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable unused-imports/no-unused-vars */
-/* eslint-disable max-len */
-/* eslint-disable @typescript-eslint/explicit-member-accessibility */
-// @ts-ignore
 import { dirname } from 'path';
 import { ensureDir, readFile } from 'fs-extra';
 import { Utils } from '@mikro-orm/core';
@@ -19,23 +11,23 @@ import type { Knex } from '@mikro-orm/knex';
 export class BetterSqliteConnection extends AbstractSqlConnection {
     static readonly RUN_QUERY_RE = /^insert into|^update|^delete|^truncate/;
 
-    async connect(): Promise<void> {
+    public async connect(): Promise<void> {
         await ensureDir(dirname(this.config.get('dbName')!));
         this.getPatchedDialect();
         this.client = this.createKnexClient('better-sqlite3');
-        await this.client.raw('PRAGMA foreign_keys = ON');
+        await this.client.raw('PRAGMA foreign_keys = OFF');
         await this.client.raw('PRAGMA rekey = secret_key');
     }
 
-    getDefaultClientUrl(): string {
+    public getDefaultClientUrl(): string {
         return '';
     }
 
-    getClientUrl(): string {
+    public getClientUrl(): string {
         return '';
     }
 
-    async loadFile(path: string): Promise<void> {
+    public async loadFile(path: string): Promise<void> {
         const conn = await this.client.client.acquireConnection();
         await conn.exec((await readFile(path)).toString());
         await this.client.client.releaseConnection(conn);
@@ -73,12 +65,12 @@ export class BetterSqliteConnection extends AbstractSqlConnection {
     private getPatchedDialect() {
         const { Sqlite3Dialect, Sqlite3DialectTableCompiler } = MonkeyPatchable;
 
-        if (Sqlite3Dialect.prototype.__patched) {
+        if (Sqlite3Dialect.prototype.patched) {
             return Sqlite3Dialect;
         }
 
         const { processResponse } = Sqlite3Dialect.prototype;
-        Sqlite3Dialect.prototype.__patched = true;
+        Sqlite3Dialect.prototype.patched = true;
         Sqlite3Dialect.prototype.processResponse = (obj: any, runner: any) => {
             if (obj.method === 'raw' && obj.sql.trim().match(BetterSqliteConnection.RUN_QUERY_RE)) {
                 return obj.context;
@@ -87,16 +79,17 @@ export class BetterSqliteConnection extends AbstractSqlConnection {
             return processResponse(obj, runner);
         };
 
-        Sqlite3Dialect.prototype._query = (connection: any, obj: any) => {
+        Sqlite3Dialect.prototype.query = (connection: any, obj: any) => {
             const callMethod = this.getCallMethod(obj);
 
             return new Promise((resolve: any, reject: any) => {
                 /* istanbul ignore if */
                 if (!connection || !connection[callMethod]) {
-                    return reject(new Error(`Error calling ${callMethod} on connection.`));
+                    reject(new Error(`Error calling ${callMethod} on connection.`));
+                    return;
                 }
 
-                connection[callMethod](obj.sql, obj.bindings, function (this: any, err: any, response: any) {
+                connection[callMethod](obj.sql, obj.bindings, function conn(this: any, err: any, response: any) {
                     if (err) {
                         return reject(err);
                     }
@@ -110,7 +103,7 @@ export class BetterSqliteConnection extends AbstractSqlConnection {
         };
 
         /* istanbul ignore next */
-        Sqlite3DialectTableCompiler.prototype.foreign = function (this: typeof Sqlite3DialectTableCompiler, foreignInfo: Dictionary) {
+        Sqlite3DialectTableCompiler.prototype.foreign = function comp(this: typeof Sqlite3DialectTableCompiler, foreignInfo: Dictionary) {
             foreignInfo.column = this.formatter.columnize(foreignInfo.column);
             foreignInfo.column = Array.isArray(foreignInfo.column)
                 ? foreignInfo.column
@@ -118,17 +111,18 @@ export class BetterSqliteConnection extends AbstractSqlConnection {
             foreignInfo.inTable = this.formatter.columnize(foreignInfo.inTable);
             foreignInfo.references = this.formatter.columnize(foreignInfo.references);
 
-            const addColumnQuery = this.sequence.find((query: { sql: string }) => query.sql.includes(`add column ${foreignInfo.column[0]}`));
+            const addColumnQuery = this.sequence.find((query: { sql: string }) => query.sql.includes(`add column
+            ${foreignInfo.column[0]}`));
 
             // no need for temp tables if we just add a column
             if (addColumnQuery) {
                 const onUpdate = foreignInfo.onUpdate ? ` on update ${foreignInfo.onUpdate}` : '';
                 const onDelete = foreignInfo.onDelete ? ` on delete ${foreignInfo.onDelete}` : '';
-                addColumnQuery.sql += ` constraint ${foreignInfo.keyName} references ${foreignInfo.inTable} (${foreignInfo.references})${onUpdate}${onDelete}`;
+                addColumnQuery.sql += ` constraint ${foreignInfo.keyName} references ${foreignInfo.inTable}
+                (${foreignInfo.references})${onUpdate}${onDelete}`;
                 return;
             }
 
-            // eslint-disable-next-line @typescript-eslint/no-this-alias
             const compiler = this;
 
             if (this.method !== 'create' && this.method !== 'createIfNot') {

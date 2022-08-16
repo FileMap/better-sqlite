@@ -1,46 +1,35 @@
 /* eslint-disable @typescript-eslint/require-await */
 /* eslint-disable no-await-in-loop */
-/* eslint-disable @typescript-eslint/no-shadow */
-/* eslint-disable @typescript-eslint/restrict-plus-operands */
-/* eslint-disable prefer-destructuring */
-/* eslint-disable no-return-assign */
-/* eslint-disable func-names */
-/* eslint-disable consistent-return */
-/* eslint-disable @typescript-eslint/restrict-template-expressions */
-/* eslint-disable no-promise-executor-return */
-/* eslint-disable no-underscore-dangle */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable unused-imports/no-unused-vars */
-/* eslint-disable max-len */
-/* eslint-disable @typescript-eslint/explicit-member-accessibility */
-// @ts-ignore
 import { SchemaHelper } from '@mikro-orm/knex';
 
 import type { Connection, Dictionary } from '@mikro-orm/core';
 import type { AbstractSqlConnection, Check, Index } from '@mikro-orm/knex';
 
 export class BetterSqliteSchemaHelper extends SchemaHelper {
-    disableForeignKeysSQL(): string {
+    public disableForeignKeysSQL(): string {
         return 'pragma foreign_keys = off;';
     }
 
-    enableForeignKeysSQL(): string {
+    public enableForeignKeysSQL(): string {
         return 'pragma foreign_keys = on;';
     }
 
-    supportsSchemaConstraints(): boolean {
+    public supportsSchemaConstraints(): boolean {
         return false;
     }
 
-    getListTablesSQL(): string {
-        return 'select name as table_name from sqlite_master where type = \'table\' and name != \'sqlite_sequence\' and name != \'geometry_columns\' and name != \'spatial_ref_sys\' '
-      + 'union all select name as table_name from sqlite_temp_master where type = \'table\' order by name';
+    public getListTablesSQL(): string {
+        return 'select name as table_name from sqlite_master where type = \'table\' and name != \'sqlite_sequence\''
+        + 'and name != \'geometry_columns\' and name != \'spatial_ref_sys\' '
+        + 'union all select name as table_name from sqlite_temp_master where type = \'table\' order by name';
     }
 
-    async getColumns(connection: AbstractSqlConnection, tableName: string, _schemaName?: string): Promise<any[]> {
+    public async getColumns(connection: AbstractSqlConnection, tableName: string, _schemaName?: string): Promise<any[]> {
         const columns = await connection.execute<any[]>(`pragma table_info('${tableName}')`);
         const sql = 'select sql from sqlite_master where type = ? and name = ?';
         const tableDefinition = await connection.execute<{ sql: string }>(sql, ['table', tableName], 'get');
+        // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
         const composite = columns.reduce((count, col) => count + (col.pk ? 1 : 0), 0) > 1;
         // there can be only one, so naive check like this should be enough
         const hasAutoincrement = tableDefinition.sql.toLowerCase().includes('autoincrement');
@@ -60,7 +49,12 @@ export class BetterSqliteSchemaHelper extends SchemaHelper {
         });
     }
 
-    async getEnumDefinitions(connection: AbstractSqlConnection, _checks: Check[], tableName: string, _schemaName: string): Promise<Dictionary<string[]>> {
+    public async getEnumDefinitions(
+        connection: AbstractSqlConnection,
+        _checks: Check[],
+        tableName: string,
+        _schemaName: string,
+    ): Promise<Dictionary<string[]>> {
         const sql = 'select sql from sqlite_master where type = ? and name = ?';
         const tableDefinition = await connection.execute<{ sql: string }>(sql, ['table', tableName], 'get');
 
@@ -72,6 +66,7 @@ export class BetterSqliteSchemaHelper extends SchemaHelper {
 
             /* istanbul ignore else */
             if (match) {
+                // eslint-disable-next-line @typescript-eslint/no-shadow
                 o[match[1]] = match[2].split(',').map((item: string) => item.trim().match(/^\(?'(.*)'/)![1]);
             }
 
@@ -79,14 +74,19 @@ export class BetterSqliteSchemaHelper extends SchemaHelper {
         }, {} as Dictionary<string[]>);
     }
 
-    async getPrimaryKeys(connection: AbstractSqlConnection, _indexes: Dictionary, tableName: string, _schemaName?: string): Promise<string[]> {
+    public async getPrimaryKeys(
+        connection: AbstractSqlConnection,
+        _indexes: Dictionary,
+        tableName: string,
+        _schemaName?: string,
+    ): Promise<string[]> {
         const sql = `pragma table_info(\`${tableName}\`)`;
         const cols = await connection.execute<{ pk: number; name: string }[]>(sql);
 
         return cols.filter(col => !!col.pk).map(col => col.name);
     }
 
-    async getIndexes(connection: AbstractSqlConnection, tableName: string, _schemaName?: string): Promise<Index[]> {
+    public async getIndexes(connection: AbstractSqlConnection, tableName: string, _schemaName?: string): Promise<Index[]> {
         const sql = `pragma table_info(\`${tableName}\`)`;
         const cols = await connection.execute<{ pk: number; name: string }[]>(sql);
         const indexes = await connection.execute<any[]>(`pragma index_list(\`${tableName}\`)`);
@@ -101,7 +101,9 @@ export class BetterSqliteSchemaHelper extends SchemaHelper {
             });
         }
 
+        // eslint-disable-next-line @typescript-eslint/no-shadow
         for (const index of indexes.filter(index => !this.isImplicitIndex(index.name))) {
+            // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
             const res = await connection.execute<{ name: string }[]>(`pragma index_info(\`${index.name}\`)`);
             ret.push(...res.map(row => ({
                 columnNames: [row.name],
@@ -114,16 +116,16 @@ export class BetterSqliteSchemaHelper extends SchemaHelper {
         return this.mapIndexes(ret);
     }
 
-    async getChecks(_connection: AbstractSqlConnection, _tableName: string, _schemaName?: string): Promise<Check[]> {
+    public async getChecks(_connection: AbstractSqlConnection, _tableName: string, _schemaName?: string): Promise<Check[]> {
     // Not supported at the moment.
         return [];
     }
 
-    getForeignKeysSQL(tableName: string): string {
+    public etForeignKeysSQL(tableName: string): string {
         return `pragma foreign_key_list(\`${tableName}\`)`;
     }
 
-    mapForeignKeys(fks: any[], tableName: string): Dictionary {
+    public mapForeignKeys(fks: any[], tableName: string): Dictionary {
         return fks.reduce((ret, fk: any) => {
             ret[fk.from] = {
                 constraintName: this.platform.getIndexName(tableName, [fk.from], 'foreign'),
@@ -141,14 +143,14 @@ export class BetterSqliteSchemaHelper extends SchemaHelper {
         }, {});
     }
 
-    async databaseExists(_connection: Connection, _name: string): Promise<boolean> {
+    public async databaseExists(_connection: Connection, _name: string): Promise<boolean> {
         return true;
     }
 
     /**
    * Implicit indexes will be ignored when diffing
    */
-    isImplicitIndex(name: string): boolean {
+    public isImplicitIndex(name: string): boolean {
     // Ignore indexes with reserved names, e.g. autoindexes
         return name.startsWith('sqlite_');
     }

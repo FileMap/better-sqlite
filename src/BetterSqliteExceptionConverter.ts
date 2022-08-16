@@ -1,19 +1,8 @@
-/* eslint-disable prefer-destructuring */
-/* eslint-disable no-return-assign */
-/* eslint-disable func-names */
-/* eslint-disable consistent-return */
-/* eslint-disable @typescript-eslint/restrict-template-expressions */
-/* eslint-disable no-promise-executor-return */
-/* eslint-disable no-underscore-dangle */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable unused-imports/no-unused-vars */
-/* eslint-disable max-len */
-/* eslint-disable @typescript-eslint/explicit-member-accessibility */
-// @ts-ignore
 import {
     CheckConstraintViolationException,
     ConnectionException, ExceptionConverter, ForeignKeyConstraintViolationException,
-    InvalidFieldNameException, LockWaitTimeoutException, NonUniqueFieldNameException, NotNullConstraintViolationException, ReadOnlyException, SyntaxErrorException, TableExistsException, TableNotFoundException, UniqueConstraintViolationException,
+    InvalidFieldNameException, LockWaitTimeoutException, NonUniqueFieldNameException, NotNullConstraintViolationException,
+    ReadOnlyException, SyntaxErrorException, TableExistsException, TableNotFoundException, UniqueConstraintViolationException,
 } from '@mikro-orm/core';
 
 import type { Dictionary, DriverException } from '@mikro-orm/core';
@@ -25,16 +14,16 @@ export class BetterSqliteExceptionConverter extends ExceptionConverter {
    * @link http://www.sqlite.org/c3ref/c_abort.html
    * @link https://github.com/doctrine/dbal/blob/master/src/Driver/AbstractSQLiteDriver.php
    */
-    convertException(exception: Error & Dictionary): DriverException {
+    public convertException(exception: Error & Dictionary): DriverException {
         if (exception.message.includes('database is locked')) {
             return new LockWaitTimeoutException(exception);
         }
 
         if (
             exception.message.includes('must be unique')
-      || exception.message.includes('is not unique')
-      || exception.message.includes('are not unique')
-      || exception.message.includes('UNIQUE constraint failed')
+        || exception.message.includes('is not unique')
+        || exception.message.includes('are not unique')
+        || exception.message.includes('UNIQUE constraint failed')
         ) {
             return new UniqueConstraintViolationException(exception);
         }
