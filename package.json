@@ -1,77 +1,29 @@
 {
-  "name": "@mikro-orm/better-sqlite",
+  "name": "@filemap/better-sqlite",
   "version": "5.3.1",
   "description": "TypeScript ORM for Node.js based on Data Mapper, Unit of Work and Identity Map patterns. Supports MongoDB, MySQL, PostgreSQL and SQLite databases as well as usage with vanilla JavaScript.",
   "main": "dist/index.js",
-  "module": "dist/index.mjs",
   "typings": "dist/index.d.ts",
-  "exports": {
-    "./package.json": "./package.json",
-    ".": {
-      "import": {
-        "types": "./dist/index.d.ts",
-        "default": "./dist/index.mjs"
-      },
-      "require": "./dist/index.js"
-    }
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+ssh://git@github.com/mikro-orm/mikro-orm.git"
-  },
-  "keywords": [
-    "orm",
-    "mongo",
-    "mongodb",
-    "mysql",
-    "mariadb",
-    "postgresql",
-    "sqlite",
-    "sqlite3",
-    "ts",
-    "typescript",
-    "js",
-    "javascript",
-    "entity",
-    "ddd",
-    "mikro-orm",
-    "unit-of-work",
-    "data-mapper",
-    "identity-map"
-  ],
-  "author": "Martin Adámek",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/mikro-orm/mikro-orm/issues"
-  },
-  "homepage": "https://mikro-orm.io",
   "engines": {
     "node": ">= 14.0.0"
   },
   "scripts": {
-    "build": "yarn clean && yarn compile",
-    "postbuild": "yarn gen-esm-wrapper dist/index.js dist/index.mjs",
-    "clean": "rimraf ./dist *.db",
-    "compile": "tsc -p tsconfig.build.json",
-    "copy": "ts-node -T scripts/copy.ts"
+    "build": "rimraf dist && tsc"
   },
-  "publishConfig": {
-    "access": "public"
-  },
+  "license": "MIT",
   "dependencies": {
     "@mikro-orm/knex": "^5.3.1",
     "better-sqlite3": "https://github.com/m4heshd/better-sqlite3-multiple-ciphers.git",
-    "better-sqlite3-multiple-ciphers": "^7.6.2",
     "fs-extra": "^10.1.0",
-    "rimraf": "^3.0.2",
-    "sqlstring-sqlite": "0.1.1",
-    "ts-node": "^10.9.1"
+    "sqlstring-sqlite": "0.1.1"
   },
   "devDependencies": {
     "@mikro-orm/core": "^5.3.1",
     "@types/better-sqlite3": "^7.6.0",
     "@types/fs-extra": "^9.0.13",
-    "gen-esm-wrapper": "^1.1.3"
+    "rimraf": "^3.0.2",
+    "ts-node": "^10.9.1",
+    "typescript": "^4.7.4"
   },
   "peerDependencies": {
     "@mikro-orm/core": "^5.0.0",

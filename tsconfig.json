@@ -1,58 +1,26 @@
 {
-"compilerOptions": {
-    "module": "commonjs",
-    "sourceMap": true,
-    "declaration": true,
-    "removeComments": true,
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "incremental": true,
-    "target": "es2020",
-    "lib": [
-        "es2020"
-    ],
-    "outDir": "./dist",
-    "baseUrl": ".",
-    "paths": {
-        "@/*": [
-            "./src/*"
+    "compilerOptions": {
+        "outDir": "./dist",
+        "module": "commonjs",
+        "target": "es2020",
+        "lib": [
+            "es2020"
         ],
-        "@migrations/*": [
-            "./migrations/*"
-        ],
-        "@orm-config": [
-            "./mikro-orm.config.ts"
-        ]
+        "moduleResolution": "node",
+        "declaration": true,
+        "sourceMap": false,
+        "strict": true,
+        "suppressImplicitAnyIndexErrors": true,
+        "esModuleInterop": true,
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
+        "preserveConstEnums": true
     },
-    "strict": true,
-    "alwaysStrict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true,
-    "allowSyntheticDefaultImports": true,
-    "plugins": [
-        // Transform paths in output .js files
-        {
-            "transform": "typescript-transform-paths"
-        },
-        // Transform paths in output .d.ts files (Include this line if you output declarations files)
-        {
-            "transform": "typescript-transform-paths",
-            "afterDeclarations": true
-        }
+    "exclude": [
+        "node_modules",
+        "dist"
+    ],
+    "include": [
+        "src/**/*"
     ]
-},
-"include": [
-    "mikro-orm.config.ts",
-    "src/**/*",
-    "test/**/*",
-    "migrations/**/*"
-],
-"exclude": [
-    "node_modules",
-    "dist"
-]
 }
