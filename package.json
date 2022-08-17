@@ -14,12 +14,12 @@
   "dependencies": {
     "@mikro-orm/knex": "^5.3.1",
     "better-sqlite3": "https://github.com/m4heshd/better-sqlite3-multiple-ciphers.git",
+    "better-sqlite3-multiple-ciphers": "^7.6.2",
     "fs-extra": "^10.1.0",
     "sqlstring-sqlite": "0.1.1"
   },
   "devDependencies": {
     "@mikro-orm/core": "^5.3.1",
-    "@types/better-sqlite3": "^7.6.0",
     "@types/fs-extra": "^9.0.13",
     "rimraf": "^3.0.2",
     "ts-node": "^10.9.1",
