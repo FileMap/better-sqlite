@@ -14,11 +14,8 @@ class BetterSqliteDriver extends knex_1.AbstractSqlDriver {
         const pks = this.getPrimaryKeyFields(entityName);
         const first = res.insertId - data.length + 1;
         res.rows ?? (res.rows = []);
-        data.forEach((item, idx) => {
-            res.rows[idx] = { [pks[0]]: item[pks[0]] ?? first + idx };
-            return res.rows[idx];
-        });
-        [res.row] = res.rows;
+        data.forEach((item, idx) => res.rows[idx] = { [pks[0]]: item[pks[0]] ?? first + idx });
+        res.row = res.rows[0];
         return res;
     }
 }

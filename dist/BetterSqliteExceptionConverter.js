@@ -5,18 +5,18 @@ const core_1 = require("@mikro-orm/core");
 class BetterSqliteExceptionConverter extends core_1.ExceptionConverter {
     /* istanbul ignore next */
     /**
-   * @inheritDoc
-   * @link http://www.sqlite.org/c3ref/c_abort.html
-   * @link https://github.com/doctrine/dbal/blob/master/src/Driver/AbstractSQLiteDriver.php
-   */
+     * @inheritDoc
+     * @link http://www.sqlite.org/c3ref/c_abort.html
+     * @link https://github.com/doctrine/dbal/blob/master/src/Driver/AbstractSQLiteDriver.php
+     */
     convertException(exception) {
         if (exception.message.includes('database is locked')) {
             return new core_1.LockWaitTimeoutException(exception);
         }
-        if (exception.message.includes('must be unique')
-            || exception.message.includes('is not unique')
-            || exception.message.includes('are not unique')
-            || exception.message.includes('UNIQUE constraint failed')) {
+        if (exception.message.includes('must be unique') ||
+            exception.message.includes('is not unique') ||
+            exception.message.includes('are not unique') ||
+            exception.message.includes('UNIQUE constraint failed')) {
             return new core_1.UniqueConstraintViolationException(exception);
         }
         if (exception.message.includes('may not be NULL') || exception.message.includes('NOT NULL constraint failed')) {
