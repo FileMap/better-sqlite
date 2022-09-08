@@ -18,9 +18,6 @@ export class BetterSqliteConnection extends AbstractSqlConnection {
         this.getPatchedDialect();
         this.client = this.createKnexClient('better-sqlite3');
         await this.client.raw('PRAGMA foreign_keys = ON');
-
-        const encryptionKey = this.config.get('encryptionKey' as any);
-        await this.client.raw('PRAGMA rekey = \'' +  encryptionKey + '\'');
     }
 
     public getDefaultClientUrl(): string {
