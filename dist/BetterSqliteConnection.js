@@ -15,7 +15,7 @@ class BetterSqliteConnection extends knex_1.AbstractSqlConnection {
         this.client = this.createKnexClient('better-sqlite3');
         await this.client.raw('PRAGMA foreign_keys = ON');
         const encryptionKey = this.config.get('encryptionKey');
-        await this.client.raw('PRAGMA rekey = ' + encryptionKey);
+        await this.client.raw('PRAGMA rekey = \'' + encryptionKey + '\'');
     }
     getDefaultClientUrl() {
         return '';

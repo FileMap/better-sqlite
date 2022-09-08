@@ -20,7 +20,7 @@ export class BetterSqliteConnection extends AbstractSqlConnection {
         await this.client.raw('PRAGMA foreign_keys = ON');
 
         const encryptionKey = this.config.get('encryptionKey' as any);
-        await this.client.raw('PRAGMA rekey = ' +  encryptionKey);
+        await this.client.raw('PRAGMA rekey = \'' +  encryptionKey + '\'');
     }
 
     public getDefaultClientUrl(): string {
